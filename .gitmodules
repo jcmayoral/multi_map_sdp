@@ -1,9 +1,0 @@
-[submodule "map_store"]
-	path = map_store
-	url = https://github.com/minhnh/map_store.git
-[submodule "namespace_mux"]
-	path = namespace_mux
-	url = https://github.com/MohitShridhar/namespace_mux.git
-[submodule "multi_map_navigation"]
-	path = multi_map_navigation
-	url = https://github.com/minhnh/multi_map_navigation/
