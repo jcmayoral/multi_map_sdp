@@ -1,9 +1,0 @@
-[submodule "multi_map_navigation"]
-	path = multi_map_navigation
-	url = https://github.com/jcmayoral/multi_map_navigation.git
-[submodule "namespace_mux"]
-	path = namespace_mux
-	url = https://github.com/jcmayoral/namespace_mux.git
-[submodule "map_store"]
-	path = map_store
-	url = https://github.com/jcmayoral/map_store
