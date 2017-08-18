@@ -20,3 +20,11 @@
 * rename maps: ```rosservice call /rename_map "map_id: '87721635-3eed-4361-8d7b-52697165b690' new_name: 'BRS 069'"```
 * list maps: ```rosservice call /list_maps "{}"```
 
+### Update maps names
+
+* terminal: mongo
+* db.adminCommand({listDatabases :1})
+* use map_store
+* Query db.map.find()
+* Problem: all maps are named new map:
+* Update : db.maps.update({name: "New Map"}, {$set: {name: "<new_name>"}})
