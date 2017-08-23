@@ -1,0 +1,34 @@
+<package>
+    <name>multi_map_server</name>
+    <version>1.0.0</version>
+    <description>
+
+        Modifications to map_server from David V. Lu and Michael Ferguson, to handle multi_maps.
+
+    </description>
+    <author>Brian Gerkey, Tony Pratkanis</author>
+    <author>contradict@gmail.com</author>
+    <maintainer email="davidvlu@gmail.com">David V. Lu!!</maintainer>
+    <maintainer email="mferguson@fetchrobotics.com">Michael Ferguson</maintainer>
+    <maintainer email="jocamaba1989@gmail.com">Jose Mayoral</maintainer>
+    <url> todo </url>
+    <license> TODO </license>
+
+    <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+
+    <build_depend>nav_msgs</build_depend>
+    <build_depend>roscpp</build_depend>
+    <build_depend>rostest</build_depend>
+    <build_depend>sdl-image</build_depend>
+    <build_depend>tf</build_depend>
+    <build_depend>yaml-cpp</build_depend>
+
+    <run_depend>nav_msgs</run_depend>
+    <run_depend>roscpp</run_depend>
+    <run_depend>rostest</run_depend>
+    <run_depend>sdl-image</run_depend>
+    <run_depend>tf</run_depend>
+    <run_depend>yaml-cpp</run_depend>
+
+    <test_depend>rospy</test_depend>
+</package>
