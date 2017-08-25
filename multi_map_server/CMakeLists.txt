@@ -5,7 +5,9 @@ find_package(catkin REQUIRED
         COMPONENTS
             roscpp
             tf
+            roslib
             nav_msgs
+            std_msgs
         )
 
 find_package(Boost REQUIRED COMPONENTS system)
@@ -23,8 +25,10 @@ catkin_package(
         multi_image_loader
     CATKIN_DEPENDS
         roscpp
+        roslib
         tf
         nav_msgs
+        std_msgs
 )
 
 include_directories( include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} )
@@ -38,9 +42,9 @@ target_link_libraries(multi_map_server
     ${catkin_LIBRARIES}
 )
 
-add_executable(multi-map_server-map_saver src/multi_map_saver.cpp)
-set_target_properties(multi-map_server-map_saver PROPERTIES OUTPUT_NAME map_saver)
-target_link_libraries(multi-map_server-map_saver
+add_executable(multi_map_server-map_saver src/multi_map_saver.cpp)
+set_target_properties(multi_map_server-map_saver PROPERTIES OUTPUT_NAME map_saver)
+target_link_libraries(multi_map_server-map_saver
     ${catkin_LIBRARIES}
     )
 
@@ -73,7 +77,7 @@ if(CATKIN_ENABLE_TESTING)
 endif()
 
 ## Install executables and/or libraries
-install(TARGETS multi-map_server-map_saver multi_map_server multi_image_loader
+install(TARGETS multi_map_server-map_saver multi_map_server multi_image_loader
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -85,7 +89,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
   PATTERN ".svn" EXCLUDE)
 
 ## Install excutable python script
-install( 
+install(
     PROGRAMS
       scripts/crop_map
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

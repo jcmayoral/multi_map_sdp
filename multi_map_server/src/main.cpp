@@ -40,12 +40,16 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <fstream>
+#include <std_msgs/String.h>
 
 #include "ros/ros.h"
 #include "ros/console.h"
 #include "multi_map_server/multi_image_loader.h"
 #include "nav_msgs/MapMetaData.h"
 #include "yaml-cpp/yaml.h"
+
+//Modications
+#include <ros/package.h>
 
 #ifdef HAVE_NEW_YAMLCPP
 // The >> operator disappeared in yaml-cpp 0.5, so this function is
@@ -61,9 +65,12 @@ class MultiMapServer
 {
   public:
     /** Trivial constructor */
-    MultiMapServer(const std::string& fname, double res)
+    MultiMapServer(){
+
+    }
+    void load(const std::string& fname, double res)
     {
-      std::string mapfname = "";   
+      std::string mapfname = "";
       double origin[3];
       int negate;
       double occ_th, free_th;
@@ -88,31 +95,31 @@ class MultiMapServer
         YAML::Node doc;
         parser.GetNextDocument(doc);
 #endif
-        try { 
-          doc["resolution"] >> res; 
-        } catch (YAML::InvalidScalar) { 
+        try {
+          doc["resolution"] >> res;
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
           exit(-1);
         }
-        try { 
-          doc["negate"] >> negate; 
-        } catch (YAML::InvalidScalar) { 
+        try {
+          doc["negate"] >> negate;
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a negate tag or it is invalid.");
           exit(-1);
         }
-        try { 
-          doc["occupied_thresh"] >> occ_th; 
-        } catch (YAML::InvalidScalar) { 
+        try {
+          doc["occupied_thresh"] >> occ_th;
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain an occupied_thresh tag or it is invalid.");
           exit(-1);
         }
-        try { 
-          doc["free_thresh"] >> free_th; 
-        } catch (YAML::InvalidScalar) { 
+        try {
+          doc["free_thresh"] >> free_th;
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a free_thresh tag or it is invalid.");
           exit(-1);
         }
-        try { 
+        try {
           std::string modeS = "";
           doc["mode"] >> modeS;
 
@@ -126,20 +133,20 @@ class MultiMapServer
             ROS_ERROR("Invalid mode tag \"%s\".", modeS.c_str());
             exit(-1);
           }
-        } catch (YAML::Exception) { 
+        } catch (YAML::Exception) {
           ROS_DEBUG("The map does not contain a mode tag or it is invalid... assuming Trinary");
           mode = TRINARY;
         }
-        try { 
-          doc["origin"][0] >> origin[0]; 
-          doc["origin"][1] >> origin[1]; 
-          doc["origin"][2] >> origin[2]; 
-        } catch (YAML::InvalidScalar) { 
+        try {
+          doc["origin"][0] >> origin[0];
+          doc["origin"][1] >> origin[1];
+          doc["origin"][2] >> origin[2];
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain an origin tag or it is invalid.");
           exit(-1);
         }
-        try { 
-          doc["image"] >> mapfname; 
+        try {
+          doc["image"] >> mapfname;
           // TODO: make this path-handling more robust
           if(mapfname.size() == 0)
           {
@@ -153,7 +160,7 @@ class MultiMapServer
             mapfname = std::string(dirname(fname_copy)) + '/' + mapfname;
             free(fname_copy);
           }
-        } catch (YAML::InvalidScalar) { 
+        } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain an image tag or it is invalid.");
           exit(-1);
         }
@@ -182,9 +189,10 @@ class MultiMapServer
       // Latched publisher for metadata
       metadata_pub= n.advertise<nav_msgs::MapMetaData>("map_metadata", 1, true);
       metadata_pub.publish( meta_data_message_ );
-      
+
       // Latched publisher for data
       map_pub = n.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
+      ROS_INFO_STREAM("Map Published" << n.getNamespace());
       map_pub.publish( map_resp_.map );
     }
 
@@ -222,31 +230,60 @@ class MultiMapServer
 
 };
 
+
+class Manager{
+  public:
+    std::string fname;
+    double res;
+    ros::Subscriber sub;
+    bool isTriggered;
+
+    void mapCB (const std_msgs::String::ConstPtr& msg){
+      std::string path = ros::package::getPath("multi_map_navigation");
+      fname = path +"/maps/partial-c069-maps/" + msg->data.c_str() + "/map.yaml";
+      isTriggered = true;
+      ROS_INFO("Received new MAp");
+    };
+
+    Manager(ros::NodeHandle nh): fname(), res(), isTriggered(true){
+      ROS_INFO("Manager constructor");
+      sub = nh.subscribe("map_name", 1000, &Manager::mapCB, this);
+
+    };
+};
+
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "map_server", ros::init_options::AnonymousName);
-  if(argc != 3 && argc != 2)
-  {
-    ROS_ERROR("%s", USAGE);
-    exit(-1);
-  }
+  ros::init(argc, argv, "multi_map_server");
+  ros::NodeHandle nh("~");
+
   if (argc != 2) {
     ROS_WARN("Using deprecated map server interface. Please switch to new interface.");
   }
-  std::string fname(argv[1]);
-  double res = (argc == 2) ? 0.0 : atof(argv[2]);
 
-  try
-  {
-    MultiMapServer ms(fname, res);
-    ros::spin();
-  }
-  catch(std::runtime_error& e)
-  {
-    ROS_ERROR("multi_map_server exception: %s", e.what());
-    return -1;
-  }
+  MultiMapServer ms;
+  Manager manager(nh);
+  manager.res = (argc == 2) ? 0.0 : atof(argv[2]);
 
+  std::string path = ros::package::getPath("multi_map_navigation");
+  manager.fname = path +"/maps/partial-c069-maps/" + argv[1] + "/map.yaml";
+  ROS_INFO_STREAM("Path " << path);
+
+  while (ros::ok()){
+    try
+    {
+      if(manager.isTriggered){
+        ms.load(manager.fname, manager.res);
+        ROS_INFO("Initialized first map");
+        manager.isTriggered = false;
+      }
+      ros::spinOnce(); // this is where the magic happens!!
+    }
+    catch(std::runtime_error& e)
+    {
+      ROS_ERROR("multi_map_server exception: %s", e.what());
+      return -1;
+    }
+  }
   return 0;
 }
-
