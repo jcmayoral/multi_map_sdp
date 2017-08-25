@@ -30,11 +30,7 @@
 /* Author: Brian Gerkey */
 /* Modifications: Jose Mayoral */
 
-#define USAGE "\nUSAGE: multi_map_server <map.yaml>\n" \
-              "  map.yaml: map description file\n" \
-              "DEPRECATED USAGE: map_server <map> <resolution>\n" \
-              "  map: image file to load\n"\
-              "  resolution: map resolution [meters/pixel]"
+#define USAGE "\nUSAGE: multi_map_server <map_name in multi_map_navigation_maps folder>\n"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -257,8 +253,10 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "multi_map_server");
   ros::NodeHandle nh("~");
 
-  if (argc != 2) {
-    ROS_WARN("Using deprecated map server interface. Please switch to new interface.");
+  if(argc != 2)
+  {
+    ROS_ERROR("%s", USAGE);
+    exit(-1);
   }
 
   MultiMapServer ms;
