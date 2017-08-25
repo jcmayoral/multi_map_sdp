@@ -40,7 +40,7 @@
 
 #include "ros/ros.h"
 #include "ros/console.h"
-#include "multi_map_server/multi_image_loader.h"
+#include "map_server/image_loader.h"
 #include "nav_msgs/MapMetaData.h"
 #include "yaml-cpp/yaml.h"
 
@@ -169,7 +169,7 @@ class MultiMapServer
       }
 
       ROS_INFO("Loading map from image \"%s\"", mapfname.c_str());
-      multi_map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),res,negate,occ_th,free_th, origin, mode);
+      map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),res,negate,occ_th,free_th, origin, mode);
       map_resp_.map.info.map_load_time = ros::Time::now();
       map_resp_.map.header.frame_id = frame_id;
       map_resp_.map.header.stamp = ros::Time::now();
