@@ -238,7 +238,7 @@ class Manager{
       std::string path = ros::package::getPath("multi_map_navigation");
       fname = path +"/maps/partial-c069-maps/" + msg->data.c_str() + "/map.yaml";
       isTriggered = true;
-      ROS_INFO("Received new MAp");
+      ROS_INFO_STREAM("New Map Path " << fname);
     };
 
     Manager(ros::NodeHandle nh): fname(), res(), isTriggered(true){
@@ -265,14 +265,14 @@ int main(int argc, char **argv)
 
   std::string path = ros::package::getPath("multi_map_navigation");
   manager.fname = path +"/maps/partial-c069-maps/" + argv[1] + "/map.yaml";
-  ROS_INFO_STREAM("Path " << path);
+  ROS_INFO_STREAM("Path " << manager.fname);
 
   while (ros::ok()){
     try
     {
       if(manager.isTriggered){
         ms.load(manager.fname, manager.res);
-        ROS_INFO("Initialized first map");
+        ROS_INFO("Initialized new map");
         manager.isTriggered = false;
       }
       ros::spinOnce(); // this is where the magic happens!!
