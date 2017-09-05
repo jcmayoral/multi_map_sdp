@@ -81,7 +81,7 @@ class MultiMapServer
         std::ifstream fin(fname.c_str());
         if (fin.fail()) {
           ROS_ERROR("Map_server could not open %s.", fname.c_str());
-          exit(-1);
+          return;//exit(-1);
         }
 #ifdef HAVE_NEW_YAMLCPP
         // The document loading process changed in yaml-cpp 0.5.
@@ -280,7 +280,7 @@ int main(int argc, char **argv)
     catch(std::runtime_error& e)
     {
       ROS_ERROR("multi_map_server exception: %s", e.what());
-      return -1;
+      //return -1;
     }
   }
   return 0;
